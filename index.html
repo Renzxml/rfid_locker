@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Locker System Control Panel</title>
+    
+    <!-- CSS Styling -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            text-align: center;
+            width: 350px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        button {
+            background-color: #4CAF50; /* Green */
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:active {
+            background-color: #3e8e41;
+        }
+
+        .alert {
+            background-color: #f44336; /* Red */
+            color: #fff;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .connected {
+            background-color: #4CAF50; /* Green */
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+            margin-top: 10px;
+        }
+    </style>
+
+    <!-- WebSocket Logic -->
+    <script>
+        const socket = new WebSocket("ws://192.168.0.109:8080");
+
+        socket.onopen = function() {
+            console.log("Connected to WebSocket server");
+            document.getElementById('connectionStatus').innerText = "Connected";
+            document.getElementById('connectionStatus').classList.add('connected');
+        };
+
+        socket.onmessage = function(event) {
+            const message = event.data;
+            console.log("Message from server:", message);
+
+            if (message.startsWith("identify_led:")) {
+                const ledPin = message.split(":")[1];
+                alert(`✅ LED on GPIO ${ledPin} is activated!`);
+            } else if (message.startsWith("error:")) {
+                const errorMsg = message.split(":")[1];
+                showAlert(errorMsg);
+            }
+        };
+
+        socket.onerror = function() {
+            showAlert("WebSocket connection error.");
+        };
+
+        socket.onclose = function() {
+            showAlert("Disconnected from WebSocket server.");
+        };
+
+        function startRFIDScan() {
+            socket.send("start_registration");
+            alert("📡 RFID Registration mode activated. Scan RFID now!");
+        }
+
+        function identifyLED() {
+            socket.send("start_identification");
+            alert("🔎 LED Identification mode activated. Scan RFID now!");
+        }
+
+        function showAlert(message) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerText = message;
+            alertBox.style.display = 'block';
+
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>RFID Locker System Control Panel</h1>
+
+        <div id="connectionStatus">Connecting...</div>
+        
+        <button onclick="startRFIDScan()">Start RFID Registration</button>
+        <button onclick="identifyLED()">Identify LED with RFID</button>
+
+        <div id="alertBox" class="alert"></div>
+    </div>
+</body>
+</html>

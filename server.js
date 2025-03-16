@@ -2,7 +2,7 @@ const WebSocket = require('ws');
 const mysql = require('mysql');
 
 // WebSocket Server Configuration
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 1800 });
 
 // Database Configuration
 const db = mysql.createConnection({
@@ -54,4 +54,4 @@ wss.on('connection', ws => {
     });
 });
 
-console.log('WebSocket server running on ws://localhost:8080');
+console.log('WebSocket server running on ws://localhost:1800');

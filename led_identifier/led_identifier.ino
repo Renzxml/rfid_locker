@@ -15,7 +15,7 @@
 const char* ssid = "Nothing Happened";
 const char* password = "Semicolon123*";
 
-const char* websocketServer = "192.168.0.109"; // WebSocket Server IP
+const char* websocketServer = "192.168.1.14"; // WebSocket Server IP
 const int websocketPort = 8080;                // WebSocket Server Port
 
 WebSocketsClient webSocket;
